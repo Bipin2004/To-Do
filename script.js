@@ -1,6 +1,6 @@
 // References
-const taskForm = document.getElementById('form');
-const taskInput = document.getElementById('input');
+const taskForm = document.getElementById('task-form');
+const taskInput = document.getElementById('task-input');
 const taskList = document.getElementById('task-list');
 const filterButtons = document.querySelectorAll('.filter-btn');
 const toast = document.getElementById('toast');
@@ -27,9 +27,10 @@ function saveTasks(tasks) {
   localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
+// Create Task Element
 function createTaskElement(task) {
   const li = document.createElement('li');
-  li.className = 'flex justify-between items-center p-3 bg-gray-100 dark:bg-zinc-700 rounded transition-all';
+  li.className = 'flex justify-between items-center p-3 bg-gray-100 dark:bg-zinc-700 rounded transition-all animate-fade-in';
 
   const text = document.createElement('span');
   text.textContent = task.text;
@@ -41,6 +42,7 @@ function createTaskElement(task) {
   buttons.className = 'flex gap-2';
 
   const completeButton = document.createElement('button');
+  completeButton.type = "button";
   completeButton.textContent = 'Complete';
   completeButton.className = 'text-green-600 hover:underline';
   completeButton.addEventListener('click', () => {
@@ -48,6 +50,7 @@ function createTaskElement(task) {
   });
 
   const editButton = document.createElement('button');
+  editButton.type = "button";
   editButton.textContent = 'Edit';
   editButton.className = 'text-blue-600 hover:underline';
   editButton.addEventListener('click', () => {
@@ -55,6 +58,7 @@ function createTaskElement(task) {
   });
 
   const deleteButton = document.createElement('button');
+  deleteButton.type = "button";
   deleteButton.textContent = 'Delete';
   deleteButton.className = 'text-red-600 hover:underline';
   deleteButton.addEventListener('click', () => {
@@ -79,8 +83,7 @@ function renderTasks(filter = 'all') {
     tasks = tasks.filter(task => !task.completed);
   }
 
-  // Newest first
-  tasks.sort((a, b) => b.id - a.id);
+  tasks.sort((a, b) => b.id - a.id); // newest first
 
   tasks.forEach(task => {
     const taskItem = createTaskElement(task);
@@ -107,6 +110,7 @@ taskForm.addEventListener('submit', (e) => {
   }
 });
 
+// Toggle task complete
 function toggleComplete(id) {
   const tasks = getTasks();
   const index = tasks.findIndex(task => task.id === id);
@@ -118,6 +122,7 @@ function toggleComplete(id) {
   }
 }
 
+// Edit task
 function editTask(id) {
   const tasks = getTasks();
   const index = tasks.findIndex(task => task.id === id);
@@ -132,6 +137,7 @@ function editTask(id) {
   }
 }
 
+// Delete task
 function deleteTask(id) {
   let tasks = getTasks();
   tasks = tasks.filter(task => task.id !== id);
@@ -139,6 +145,7 @@ function deleteTask(id) {
   renderTasks(currentFilter);
 }
 
+// Filter tasks
 filterButtons.forEach(button => {
   button.addEventListener('click', () => {
     filterButtons.forEach(btn => btn.classList.remove('active'));
@@ -148,9 +155,15 @@ filterButtons.forEach(button => {
   });
 });
 
-// Dark mode
+// Dark mode toggle with persistence
+if (localStorage.getItem('theme') === 'dark') {
+  document.body.classList.add('dark');
+}
+
 darkToggle.addEventListener('click', () => {
   document.body.classList.toggle('dark');
+  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
 });
 
+// Initial render
 renderTasks();
